@@ -34,16 +34,16 @@ Allows developers to run their code in a computing env. that does not require se
 
 - Object Storage is a system that manages the use of storage in terms of objects or blobs. Files are not stores in a file system. Each object is addressable via an URL.
 - Files storage services provide a hierarchical storage system for files, based on the Network File System (NFS) storage system.
-- Block Storage is commonly used in ephemeral and persistent disks attached to VMs. With a block storage system, you can install sile systems on top of block storage, or you can run apps that access blocks directly, like some relational DBs. Common block size 4KB to 8KB or more.
+- Block Storage is commonly used in ephemeral and persistent disks attached to VMs. With a block storage system, you can install file systems on top of block storage, or you can run apps that access blocks directly, like some relational DBs. Common block size 4KB to 8KB or more.
 - caches are in-memory data stores that maintain fast access to data. 1) Memory is more expensive, 2) cache is volatile and 3) can get out of sync.
 
 ### 1.6. Storage speeds
 
 Retrieve 1 MB of data | latency | x times slower
 --- | --- | ---
-in-memory cache | 250 microsec. |
-persistent SSD | 1 000 microsec./ 1 millisec. | 4x
-persistent HDD | 20 millisec. | 20x
+in-memory cache | 250 microseconds |
+persistent SSD | 1 000 microseconds/ 1 millisecond | 4x
+persistent HDD | 20 millisecond | 20x
 Object storage | | It takes longer to retrieve data from object storage than to retrieve it from block storage.
 
 ### 1.7. Networking
@@ -93,14 +93,16 @@ FaaS
 - Block:
   - Persistent disks are storage services that are attached to VMs in Compute Engine or Kubernetes Engine.
 - File:
-  - To have access to a file system housed on a network-attached storage.
+  - To have access to a file system housed on network-attached storage.
 - SQL
-  - Cloud SQL - GCPs managed relational darabase service for MySQL or PostgreSQL
-  - Cloud Spanner - globally distributed relational database that combines benefits or relational database and ability to scale hirozontally.
+  - Cloud SQL - GCPs managed relational database service for MySQL or PostgreSQL
+  - Cloud Spanner - globally distributed relational database that combines benefits or relational database and ability to scale horizontally.
 - NoSQL
   - Cloud Firestore - NoSQL document database
-  - Bloud Bigtable - wide-column data model for low latency read/write operations
+  - Cloud Bigtable - wide-column data model for low latency read/write operations
 - In-memory cache:
   - Cloud Memorystore - managed Redis
 
+### Networking
 
+VPC - Virtual Private Cloud can span the globe without relying on the public Internet. Traffic from any server on a VPC can be securely routed through the Google global network to any other point on the network.
