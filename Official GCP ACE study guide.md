@@ -4,6 +4,7 @@
 
 1. Overview of Google Cloud Platform
 2. Google Cloud Computing Services
+3. Projects, Service Accounts, and Billing
 
 ## 1. Overview of Google Cloud Platform
 
@@ -67,26 +68,26 @@ Since cloud providers have many customers, the variation in demand of any of the
 
 IaaS -> K8s -> PaaS
 
-### Compute Engine
+### 2.1. Compute Engine
 
 VMs are programs that emulate physical servers and provide CPU, memory, storage, and other services. VMs run on a low-level service called a hypervisor. GCP uses a security-hardened version of the Kernel Virtual Machine (KVM) hypervisor.
 
-### k8s
+### 2.2. k8s
 
 Kubernetes Engine is designed to allow users to easily run containerized (lightweight VMs) applications on a cluster of servers.
 
-### App Engine
+### 2.3. App Engine
 
 Manages the underlying computing and network infrastructure.
 
 - Standard - Sandbox env.
 - Flexible - Docker containers
 
-### Cloud Functions
+### 2.4. Cloud Functions
 
 FaaS
 
-### Storage
+### 2.5. Storage
 
 - Object:
   - Cloud Storage - buckets -> Objects with URL access. Cloud Storage is not part of a VM in the way an attached persistent disk is.
@@ -103,6 +104,108 @@ FaaS
 - In-memory cache:
   - Cloud Memorystore - managed Redis
 
-### Networking
+### 2.6. Networking
 
 VPC - Virtual Private Cloud can span the globe without relying on the public Internet. Traffic from any server on a VPC can be securely routed through the Google global network to any other point on the network.
+
+### 2.7. Cloud Load Balancing
+
+Using single multicast address.
+
+### 2.8. Cloud Armor
+
+- DDOS
+- Cross-site scripting
+- SQL injection
+
+### 2.9. Cloud CDN
+
+Content Delivery Networks enable low-latency response by caching content on a set of endpoints across the globe.
+
+### 2.10. Cloud Interconnect
+
+Set of services for connecting your existing network to the Google network. Interconnect & peering.
+
+### 2.11. Cloud DNS
+
+Also provides for private zones, that allows you to create custom names for your VMs.
+
+### 2.12. Dev Tools
+
+- SDK + plugins
+- Container Registry
+- Cloud Build
+- Cloud Source Repo
+
+### 2.13. Monitoring
+
+Stackdriver – logging, monitoring, error reporting, trace, debug, profile
+
+### 2.14. Specialized services
+
+- Apigee
+- Data Prep – explore + prepare
+- Data flow – batch and stream processing
+- Data proc – managed Hadoop
+- Machine Learning
+
+## 3. Projects, Service Accounts, and Billing
+
+### 3.1. Organization
+
+G-Suite Domains and Cloud Identity accounts map to GCP Organization.
+
+1. A single cloud identity is associated with at most one organization.
+2. Cloud identities have super admins.
+3. Those super admins assign the role of Organization Administrator IAM role to users, who will administrate the organization. Users with Organization Administrator role are responsible to:
+3.1 define the structure or resource hierarchy
+3.2 defining identity access management policies over the resource hierarchy
+3.3 delegating other management roles to other users
+4. GCP will automatically grant Project Creator and Billing Account Creator roles to all roles in the domain.
+
+### 3.2. Project
+
+Anyone with `resourcemanager.projects.create` IAM permission can create a project.
+
+### 3.3. Organization Policies
+
+Organization policy service control access to an organization's resources.
+The Organization Policy Service complements the IAM service. One way to think of this difference is that IAM specifies WHO can do things and Organization Policy Service specifies WHAT can be done.
+IAM lets you assign permissions, so users and roles can perform a specific operation in the cloud.
+Organization Policy Service lets you specify limits on the ways resources can be used:
+
+- Allow a specific set of values
+- Deny a specific set of values
+- Deny a value and all its child values
+- Allow all allowed
+- Deny all values
+
+### 3.4. Policy inheritance
+
+For example, you might have a specific policy. You could attach it to an organization. All folders and projects below will inherit that policy. Since policies are inherited and cannot be disabled or overridden by objects lower in the hierarchy, this is an effective way to apply a policy across all organization resources.
+
+### 3.5. Roles in GCP
+
+A role is a collection of permissions. Roles are granted to users by binding a user to a role.
+
+Human/Service -> Identity (email) <-roles
+
+### 3.6. Granting roles to identities
+
+Permissions cannot be granted to users. Permissions can only be assigned to roles.
+Roles are then assigned to users.
+
+### 3.7. Service account
+
+Identities are usually associated with individual users. Sometimes it is helpful to have applications or VMs act on behalf of a user or perform operations that the user does not have permissions to perform.
+
+For example, an application needs access to a database, but you do not want to allow users of the application to access the database directly. A service account can be created that has access to the database. That service account can be assigned to the application, so the application can execute queries on behalf of users w/o having to grant database access to those users.
+
+The service account can be resource and identity:
+
+- Permissions -> Role -> Service account <- Identity (users)
+
+- User managed service account (up to 100 per project)
+- Google-managed service account.
+
+Service accounts can be managed as a group of accounts at the project level or an individual service account level. For example, if you grant `iam.serviceAccountUser` to a user in a specific project, then the user can manage all service accounts in the project. If you prefer to limit users to manage only a specific service account, you could grant `iam.serviceAccountUser` for a specific Service account.
