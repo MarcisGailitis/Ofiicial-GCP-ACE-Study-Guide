@@ -5,6 +5,7 @@
 1. Overview of Google Cloud Platform
 2. Google Cloud Computing Services
 3. Projects, Service Accounts, and Billing
+4. Introduction to Computing in Google Cloud
 
 ## 1. Overview of Google Cloud Platform
 
@@ -12,7 +13,7 @@
 
 To use GCP you first have to create an account with a cloud provider and provide a billing account.
 
-A zone is considered a single failure domain, which means that if all instances in your applications are running in a zone and there is a failure, then all instances of your application will be inaccessible.
+A zone is considered a single failure domain, which means that if all instances in your applications are running in a zone and there is a failure, then all instances of your application will be inaccessible. Zones are data center-like resources, but they may be comprised of one or more closely coupled data centers.
 
 ### 1.2. Compute
 
@@ -165,7 +166,7 @@ G-Suite Domains and Cloud Identity accounts map to GCP Organization.
 
 ### 3.2. Project
 
-Anyone with `resourcemanager.projects.create` IAM permission can create a project.
+Anyone with `resourcemanager.projects.create` IAM permission can create a project. Projects are the lowest-level structure in the resource hierarchy.
 
 ### 3.3. Organization Policies
 
@@ -209,3 +210,74 @@ The service account can be resource and identity:
 - Google-managed service account.
 
 Service accounts can be managed as a group of accounts at the project level or an individual service account level. For example, if you grant `iam.serviceAccountUser` to a user in a specific project, then the user can manage all service accounts in the project. If you prefer to limit users to manage only a specific service account, you could grant `iam.serviceAccountUser` for a specific Service account.
+
+### 3.8 Billing Accounts
+
+Billing acc. store information about how to pay charges for resources used. A billing account is associated with one or more projects.
+
+Billing account roles:
+
+- Billing Account Creator - the only role, which can create a billing account!!!
+- Billing Account Administrator - Authorized to see and manage all aspects of billing accounts
+- Billing Account User - Can associate projects with billing accounts
+- Billing Account Viewer - Can view information about billing accounts
+
+## 4. Introduction to Computing in Google Cloud
+
+### 4.1. Virtual Machine Custom Images
+
+You can create a custom image from a boot disk or by starting with another image:
+
+1. VM instances -> Create Instance -> choose an image -> create the VM
+2. SSH, make changes
+3. Snapshots -> Create snapshot -> Specify parameters -> Create
+4. Use the image you created from the snapshot
+
+### 4.2. Roles for Compute Engine
+
+- Compute Engine Admin
+- Compute Engine Network Admin
+- Compute Engine Security Admin
+- Compute Engine Viewer
+
+### 4.3. App Engine
+
+With App Engine you focus on your application and not on the VMs that run the application. You have little need to configure and control the underlying OS or storage system.
+
+### 4.4. K8s
+
+K8s allows you to do the following:
+
+- Create clusters of Compute Engine VMs that run the Kubernetes orchestration software
+- Deploy containerized applications in groups called pods. Containers within a single pod share storage and network
+- Administer the cluster. A pod is a logically single unit for providing a service.
+- Specify policies, like autoscaling
+- Monitor cluster health
+
+K8s provides the following functions:
+
+- Load balancing
+- Automatic scaling
+- Automatic upgrades of cluster software
+- Node monitoring + health
+- Logging
+- Support for node pools
+
+K8s overhead:
+
+- 2% - 25% of memory
+- 0.25% - 6% of CPU
+
+A K8s deployment is a group of running identical pods. These identical pods are referred to as replicas. Deployment can be in 3 states:
+
+- Progressing
+- Completed
+- Failed
+
+K8s Engine is a good choice for a large-scale application that requires high availability and high reliability.
+
+### Cloud Functions
+
+Cloud Functions is a serverless computing platform designed to run single-purpose pieces of code in response to events in the GCP environment. It provides the blue between otherwise independent services. Well suited to short-running, event-based processing.
+
+Execution of one function is independent of all others, that is Cloud functions may be running multiple instances at one time. You do not have to do anything to prevent conflicts b/w the two instances, they are independent.
