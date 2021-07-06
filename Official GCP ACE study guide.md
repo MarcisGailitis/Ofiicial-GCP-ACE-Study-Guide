@@ -282,3 +282,54 @@ K8s Engine is a good choice for a large-scale application that requires high ava
 Cloud Functions is a serverless computing platform designed to run single-purpose pieces of code in response to events in the GCP environment. It provides the blue between otherwise independent services. Well suited to short-running, event-based processing.
 
 Execution of one function is independent of all others, that is Cloud functions may be running multiple instances at one time. You do not have to do anything to prevent conflicts b/w the two instances, they are independent.
+
+## 5. Computing with Compute Engine VMs
+
+### 5.1. VM configuration Details console
+
+1. Create/Select a project
+2. Create/Select billing account
+
+The name of a VM is primarily for your use. GCP uses other identifiers internally to manage VMs.
+After you specify the region/zone, GCP can determine the VMs available in that zone.
+
+Minimal set of information in gcloud for setting up a VM: name, type (default n1-standard1), region, and zone (info can be taken from project defaults)
+
+In Identity and API section you can specify a service account for the VM and set the scope of API access. If you want the process running on this VM to use only some APIs, you can use the options to limit the VMs' access to specific APIs.
+
+- Management TAB: labels, description, Deletion protection, startup script, metadata, preemptibility, automatic restart, maintenance
+- Security: Secure Boot, virtual Trusted Platform Module, Integrity Monitoring, block project-wide SSH keys
+- Disks: Boot disk deletion rule, encryption + additional disks
+- Networking: Network interface information + network tags
+- Sole Tenancy
+
+### 5.2. VM configuration Details Cloud SDK
+
+`gcloud init` -> authenticate -> select project
+
+`gcloud compute instances create instance-1 instance2`
+
+If you do not specify additional parameters, gcloud will use your information from your default project.
+
+```shell
+# to view project information
+
+gcloud compute project-info describe
+```
+
+- `--zone`
+- `--boot-disk-size`
+- `--boot-disk-type`
+- `--labels`
+- `--machine-type`
+- `--preemptible`
+
+### 5.3. VM management
+
+`gcloud compute instances stop INSTANCE-NAME`
+
+While your VM is running you can monitor CPU, disk, and network load by viewing the monitoring page in the VM instance details
+
+### 5.4. Cost of VMs
+
+VMs are charged for a minimum of 1 minute of use. VMS are billed in 1second increments, the cost is based on machine type, Google offers discounts for sustained usage.
