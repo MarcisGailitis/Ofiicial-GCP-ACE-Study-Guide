@@ -6,6 +6,7 @@
 2. Google Cloud Computing Services
 3. Projects, Service Accounts, and Billing
 4. Introduction to Computing in Google Cloud
+5. Computing with Compute Engine VMs
 
 ## 1. Overview of Google Cloud Platform
 
