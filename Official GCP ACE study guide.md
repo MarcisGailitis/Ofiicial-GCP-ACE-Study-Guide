@@ -7,6 +7,7 @@
 3. Projects, Service Accounts, and Billing
 4. Introduction to Computing in Google Cloud
 5. Computing with Compute Engine VMs
+6. Managing Virtual Machines
 
 ## 1. Overview of Google Cloud Platform
 
@@ -277,7 +278,7 @@ A K8s deployment is a group of running identical pods. These identical pods are 
 
 K8s Engine is a good choice for a large-scale application that requires high availability and high reliability.
 
-### Cloud Functions
+### 4.5. Cloud Functions
 
 Cloud Functions is a serverless computing platform designed to run single-purpose pieces of code in response to events in the GCP environment. It provides the blue between otherwise independent services. Well suited to short-running, event-based processing.
 
@@ -333,3 +334,163 @@ While your VM is running you can monitor CPU, disk, and network load by viewing 
 ### 5.4. Cost of VMs
 
 VMs are charged for a minimum of 1 minute of use. VMS are billed in 1second increments, the cost is based on machine type, Google offers discounts for sustained usage.
+
+## 6. Managing Virtual Machines
+
+### 6.1. start, stop, delete an instance
+
+Reset = restart a VM. The properties of VM will not change, but data in memory will be lost.
+
+### 6.2. Viewing VMs
+
+Filtering based on:
+
+- Name
+- Internal IP
+- External IP
+- Status
+- Zone
+- Network
+- Deletion protection
+- Member of a managed instance group
+- Member of unmanaged instance group
+
+### 6.3. GPUs
+
+GPUs are used for math-intensive applications like visualizations or machine learning.  GPUs perform math calculations and allow some work to be off-loaded from the CPU to GPU. To add a GPU to an instance, you must:
+
+- start an instance in which GPU libraries have been installed.
+- Verify that the instance will run in a zone that has GPUs available.
+
+To add GPU:
+
+- Machine type -> Customize -> Select Nr of GPUs/GPU type
+
+Restrictions:
+
+- CPU must be compatible with the GPU
+- GPUs cannot be attached to shared memory machines
+- You must set the instance to terminate during maintenance
+
+### 6.4. Snapshots
+
+Snapshots are copies of the persistent disk. Snapshots are useful as backups and for copying data to another instance
+
+1st snapshot = full copy of a disk. 2nd snapshot = diff.
+
+FLUSH data from memory before snapshot.
+
+To work with snapshots you must be assigned the Compute Storage Admin role.
+
+When creating a snapshot you can specify name, labels, description.
+
+### 6.5. Images
+
+Images are copies of disk content to create VMs, as they save OS and related configuration.
+
+You can create Images from:
+
+- Disk
+- Snapshot
+- Cloud Storage File
+- Another Image (image can be also from a different project)
+
+When creating an image you can specify a name, labels, description, and Family (Family allows to group images, when family for the image is selected the latest image is used).
+
+You can delete or depreciate old images, which marks the image no longer supported and allows you to specify replacement images.
+
+### 6.6. gcloud global flags
+
+- `--account`
+- `--configuration`
+- `--flatten`
+- `--format`
+- `--help`
+- `--project`
+- `--quiet`
+- `--verbosity`
+
+### 6.7. gcloud starting instances
+
+`gcloud compute instances start INSTANCE_NAMES`
+
+- `--async` displays information about the start operation aka –verbose in Linux
+- `--zone`, specifies zones
+
+`gcloud compute instances stop INSTANCE_NAMES`
+
+`gcloud compute instances delete INSTANCE_NAMES`
+
+- `--zone`, specifies zones
+- `--delete-disks=(ALL,BOOT,DATA)`
+- `--keep-disks=(ALL,BOOT,DATA)`
+
+`gcloud compute instances list`
+
+`gcloud compute instances describe`
+
+### 6.8. gcloud disk -> snapshot
+
+Create a snapshot:
+
+`gcloud compute disks snapshot DISK_NAME --snapshot-names=SNAPSHOT_NAME`
+
+List snapshots:
+
+`gcloud compute snapshots list`
+
+Describe snapshots:
+
+`gcloud compute snapshots describe SNAPSHOT_NAME`
+
+### 6.9. gcloud snapshot -> disk
+
+Create a disk from snapshot:
+
+`gcloud compute disks create DISK_NAME  --source-snapshot=SNAPSHOT_NAME`
+
+- `--size=100`
+- `--type=pd-standard`
+
+### 6.10. images
+
+`gcloud compute images create IMAGE_NAMES`
+
+- `--source-disk`
+- `--source-image`
+- `--source-image-family`
+- `--source-snapshot`
+- `--source-uri`
+- `--description`
+- `--labels`
+
+`gcloud compute images delete IMAGE_NAMES`
+
+To export the image to Cloud Storage:
+
+`gcloud compute images export --destination-uri=DESTINATION_URI --image IMAGE_NAME`
+
+### 6.11. Creating and removing instance groups
+
+- Instance groups = groups of VMs with the same configuration that are managed as a single entity. Instance groups can contain instances in a single zone or across a region.
+- Managed instance groups  = are created using an instance template which is a specification of a VM configuration, including machine type, boot disks image, zone, labels, and other properties of an instance. Managed instance groups can automatically scale the number of instances in a group and be used with load balancing to distribute workloads across the instance group.
+- Unmanaged instance groups   = different configurations within different VMs within the group.
+
+`gcloud compute instance-templates create INSTANCE_TEMPLATE_NAME`
+
+- `--source-instance`, specify an existing VM as the source of the instance template.
+
+`gcloud compute instance-templates delete INSTANCE_TEMPLATE_NAME`
+
+`gcloud compute instance-templates list`
+
+`gcloud compute instance-groups managed create INSTANCE_GROUP_NAME --size=SIZE –template=TEMPLATE`
+
+- `--size`
+- `--template`
+
+`gcloud compute instance-groups managed delete INSTANCE_GROUP_NAME`
+
+`gcloud compute instance-groups managed list`
+
+`gcloud compute instance-groups managed list-instances`
