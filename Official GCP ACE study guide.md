@@ -9,6 +9,7 @@
 5. Computing with Compute Engine VMs
 6. Managing Virtual Machines
 7. Computing with Kubernetes
+8. Managing Kubernetes Clusters
 
 ## 1. Overview of Google Cloud Platform
 
@@ -592,3 +593,104 @@ gcloud and kubectl have different command syntaxes:
 When creating a cluster be sure to enable Stackdriver monitoring and logging by selecting advanced options in the create cluster form in the cloud console. Under additional features, choose Enable Stackdriver Logging Service and Enable Stackdriver Monitoring Service.
 
 Select Stackdriver -> create a Workspace (support up to 100 projects) -> Monitor GCP Resources
+
+## 8. Managing Kubernetes Clusters
+
+### 8.1. Viewing the status of Kubernetes Clusters using Cloud Console
+
+Kubernetes Engine -> Clusters -> Click on the name of the cluster to view:
+
+- Details + Addons + Permissions (shows APIs) + Details of Node Pools (separate instance groups running in a Kubernetes cluster)
+- Storage (persistent storage + storage classes)
+- Nodes: list of nodes or  VMs running in the cluster
+  - If you click on the node you will see CPU utilization, memory consumption, and disk IO + list of pods
+    - If you click on the pod you will see the pod details (CPU utilization, memory consumption, and disk IO) + events + logs + status + containers
+      - If you click on containers you will see containers information
+
+To list clusters the names and basic information of all clusters:
+
+`gcloud container clusters list`
+
+To describe a particular cluster:
+
+`gcloud container clusters describe CLUSTER_NAME --zone ZONE`
+
+To list information about the nodes and pods you use the kubectl command.
+
+Configure kubeconfig file:
+
+`gcloud container clusters get_credentials CLUSTER_NAME --zone ZONE`
+
+List/describe nodes:
+
+`kubectl get nodes`
+
+`kubectl describe nodes`
+
+List/describe pods:
+
+`kubectl get pods`
+
+`kubectl describe pods`
+
+### 8.2. Adding/ modifying. Removing nodes
+
+KE -> Clusters -> Edit -> size = xxx
+
+To resize the default node pool of an existing cluster, run:
+
+`gcloud container clusters resize CLUSTER_NAME --size=5`
+
+To enable autoscaling:
+
+`gcloud container clusters update CLUSTER_NAME --enable-autoscaling`
+
+### 8.3. Adding/ modifying. Removing pods
+
+It is considered best practice not to manipulate pods directly. K8s will maintain the nr of pods specified for a deployment. If you want to change the nr of pods, you should change the deployment configuration.
+
+Kubernetes Engine -> Workloads -> Select Deployment -> Actions -> Scale -> Nr of Replicas, or select autoscaling
+
+To list deployments:
+
+`kubectl get deployment`
+
+To scale deployment:
+
+`kubectl scale deployment DEPLOYMENT_NAME --replicas 5`
+
+To add autoscale:
+
+`Kubectl autoscale deployment DEPLOYMENT_NAME --min 1 --max 10 --cpu-percent 80`
+
+### 8.4. Adding/modifying/removing services
+
+Services are added through deployments.
+
+Kubernetes Engine ->  Workloads -> click of deployment to view services -> Click on Services to view details and delete
+
+To list services:
+
+`kubectl get services`
+
+To add services:
+
+`kubectl run hello-server --image=IMAGE_PATH --port 8080`
+
+To expose services:
+
+`kubectl expose deployment hello-server –type=”LoadBalancer”`
+
+To delete services:
+
+`kubectl delete service hello-server`
+
+### 8.5. Viewing the image repository
+
+Container Registry -> Click on the Image name to see the version -> Click on a version to see the details
+
+To list images:
+
+`gcloud container images list`
+
+`gcloud container images describe IMAGE_NAME`
