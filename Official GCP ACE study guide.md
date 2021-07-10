@@ -8,6 +8,7 @@
 4. Introduction to Computing in Google Cloud
 5. Computing with Compute Engine VMs
 6. Managing Virtual Machines
+7. Computing with Kubernetes
 
 ## 1. Overview of Google Cloud Platform
 
@@ -494,3 +495,100 @@ To export the image to Cloud Storage:
 `gcloud compute instance-groups managed list`
 
 `gcloud compute instance-groups managed list-instances`
+
+## 7. Computing with Kubernetes
+
+### 7.1. Intro to containers
+
+Containers offer a highly portable, lightweight means of distributing and scaling your application or workloads without replicating the guest OS. They can start/stop much faster (usually in seconds) and use fewer resources.
+
+### 7.2. Introduction to Kubernetes Engine
+
+Kubernetes – a containers orchestration system created and open sources by Google.
+
+Kubernetes Engine – GCP's managed Kubernetes service. With this service, GCP customers can create and maintain their Kubernetes cluster without having to manage the Kubernetes platform.
+
+Kubernetes runs containers on a cluster of virtual machines. It determines where to run containers, monitors the health of containers, and manages the full lifecycle of VM instances. This collection of tasks is called containers orchestration.
+
+It may sound as if a Kubernetes cluster is similar to an instance group and there are some similarities:
+
+- Both are sets of VMs that can be managed as a group.
+- Instance group has some monitoring and can restart instances that fail, but Kubernetes has much more flexibility with regards to maintaining a cluster of servers.
+
+Differences:
+
+- Instance groups are much more restricted. All VMs generally run the same image in an instance group. That is not the case with Kubernetes.
+- Also instance groups have no mechanism to support the deployment of containers
+
+### 7.3. Kubernetes cluster architecture
+
+Kubernetes architecture consists of several objects and a set of controllers.
+
+Kubernetes cluster consists of cluster master and one or more nodes, which are the workers of the cluster.
+
+The cluster master (ctrl plane) controls the cluster. The cluster master manages services provided by Kubernetes, such as Kubernetes API, controllers, and schedulers. All interactions with clusters are done through the master using the Kubernetes API. The cluster master issues the command that acts on a node. Users can interact with a cluster using the *kubectl* command.
+
+Nodes execute the workloads run on the cluster. Nodes are VMs that run containers configured to run an application. The nodes run an agent called *kubelet*, which is the service that communicates with the cluster master. These VMs run specialized OS optimized to run containers.
+
+Kubernetes organizes processes into workloads.
+
+### 7.4. Kubernetes objects
+
+- Pods
+- Services
+- Volumes
+- Namespaces
+
+#### 7.4.1. Pods
+
+Pods are a single instance of a running process in a cluster. Pods contain at least one container. Pods use shared networking and storage across containers. Each pod gets a unique IP address and a set of ports. Containers connect to a port. Multiple containers in a pod connect to different ports and can talk to each other on localhost. A pod allows its containers to behave as if they are running on an isolated VM, sharing common storage, IP address, and asset of pods.
+
+Pods are created in groups. Replicas are copies of a pod and constitute a group of pods that are managed as a unit.
+
+Pods support autoscaling. Pods are considered ephemeral – they are expected to terminate. The mechanism that manages to scale and health monitoring is known as a controller.
+
+Pods are similar to managed instance groups. A key difference is that pods are for executing applications in containers and may be placed in various nodes in the cluster, but MIG all execute the same application code on each of the nodes.
+
+### 7.4.2. Services
+
+Since pods are ephemeral and can be terminated by the controller, other services that depend on the pods, should not be coupled to particular pods. So Kubernetes provides a level of indirection b/w application running on pods and other applications that call them. It is called a service.
+
+- ClusterIP. Exposes a service that is only accessible from within the cluster.
+- NodePort. Exposes a service via a static port on each node’s IP.
+- LoadBalancer. Exposes the service via the cloud provider’s load balancer.
+
+### 7.4.3. ReplicaSet
+
+Controller, that ensures s the correct number of identical pods are running. Also used to update and delete pods.
+
+### 7.4.4. Deployment
+
+Deployments are sets of identical pods. The pods all run the same application because they are created using the same pod template is a definition of how to run a pod aka pod specification.
+
+### 7.5. Deploying Kubernetes Cluster + Deployment
+
+- Create Cluster (control plane + nodes)
+- Create Deployment
+- Create services
+
+1. Enable Kubernetes Engine API
+2. Kubernetes Engine -> Clusters -> Create Cluster -> Standard Cluster -> Create
+3. Kubernetes Engine -> Create Deployment -> Deploy
+4. View generated YAML file
+
+Command line for creating cluster:
+`gcloud container clusters create CLUSTER_NAME –num-nodes=3 –region=us-central1`
+
+Command line for creating deployment:
+`kubectl run ch07-app-deploy –image=ch07-app –port=8080`
+
+gcloud and kubectl have different command syntaxes:
+
+- kubectl specify a verb and then a resource: `kubectl scale deployment …`
+- gcloud specifies a resource before the verb: `gcloud container clusters create …`
+
+### 7.6. Monitoring
+
+When creating a cluster be sure to enable Stackdriver monitoring and logging by selecting advanced options in the create cluster form in the cloud console. Under additional features, choose Enable Stackdriver Logging Service and Enable Stackdriver Monitoring Service.
+
+Select Stackdriver -> create a Workspace (support up to 100 projects) -> Monitor GCP Resources
