@@ -1,4 +1,4 @@
-# Official GCP ACE study guide
+# Official GCP ACE study guide ch01 - ch09
 
 ## Table of content
 
