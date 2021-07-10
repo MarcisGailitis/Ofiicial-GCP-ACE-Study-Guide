@@ -10,6 +10,7 @@
 6. Managing Virtual Machines
 7. Computing with Kubernetes
 8. Managing Kubernetes Clusters
+9. Computing with App Engine
 
 ## 1. Overview of Google Cloud Platform
 
@@ -694,3 +695,98 @@ To list images:
 `gcloud container images list`
 
 `gcloud container images describe IMAGE_NAME`
+
+## 9. Computing with App Engine
+
+### 9.1. App Engine Components
+
+App engine Standard applications consist of the following components:
+
+- Application
+- Service
+- Version (source code (main .py)+ configuration file(conf.yaml))
+- Instance
+
+Each project can have an App Engine application. All resources associated with an App Engine app are created in the region specified when the app is created.
+
+Apps have at least one Service, which is the code executed in the App Engine environment. Because multiple versions of an application’s codebase can exist, App Engine supports the versioning of the apps.
+A service can have multiple versions, and these are usually slightly different, with newer versions having new features, bug fixes, and other changes.
+Then a version executes it creates an instance of the app.
+
+Services are typically structured to perform a single function with complex applications made up of multiple services known as microservices:
+
+- One microservice may handle API requests for data access,
+- while another microservice performs authentication and
+- the third records data for billing purposes
+
+Services are defined by their source code and configuration file. The combination of those files constitutes a version of the app.
+
+### 9.2. Deploy App engine App
+
+`gcloud components install app-engine-python`
+`git clone https://github.com/GoogleCloudPlatform/python-docs-samples`
+`cd python-docs-samples`
+
+To deploy the app to App Engine:
+
+`gcloud app deploy [DEPLOYABLES …]`
+
+- if `[DEPLOYABLES …]` = app.yaml, then no need to provide it.
+- `--version` - can specify the version nr
+- `--project` - deploy to a specific project
+- `--no-promote`, no traffic routed
+
+To view the application in the browser:
+
+`gcloud app browse`
+
+To view application details in the console:
+
+- Console -> App Engine:
+  - Services – to view apps
+  - Versions – To view deployed versions + migrate traffic
+  - Instances – To view instance performance details to understand the load on the application
+
+To stop application:
+
+`gcloud app versions stop v1`
+
+To disablement entire application in Console:
+
+Console -> App Engine -> Settings -> Disable app
+
+### 9.3. Scaling App Engine Applications
+
+Instances are created to execute an application on an App Engine managed server. App Engine can automatically add/remove instances as needed based on load. When instances are scaled based on load, they are called dynamic instances. These dynamic instances help optimize your costs by shutting down when demand is low.
+
+To specify scaling add a section to app.yaml
+
+- automatic_scaling:
+  - target_cpu_utilization – Max CPU
+  - target_throughput_utilization – max nr of concurrent requests in %
+  - max_concurrent_requests – max nr of concurrent requests
+  - max_instances
+  - min_instances
+  - max_pending_latency max time a request will wait in queue, before new instance
+  - min_pending_latency
+- basic_scaling:
+  - idle_timeout - when instance should be removed
+  - max_instances
+- manual_Scaling:
+  - instances
+
+### 9.4. Splitting traffic b/w App Engine versions
+
+If you have more than one version of an application running, you can split traffic between the versions. App Engine provides three ways to split traffic: IP Address, HTTP cookie, and by random selection:
+
+- IP address a client is always routed to the same split, as long as the IP address does not change.
+- HTTP cookie – when you want to assign users to versions
+- Random selection – when you want to evenly distribute the workload
+
+`gcloud app services ser-traffic serv1 --splits v1=.4 v2=.6`
+
+- `--splits`, to divide percentages of traffic b/w versions
+- `--migrate`, App Engine should migrate traffic from the previous version
+- `--split-by`=(IP, cookie,random)
+
+You can also migrate traffic from the console. Navigate to the versions page and select the migrate command.
