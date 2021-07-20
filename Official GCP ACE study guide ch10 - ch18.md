@@ -6,6 +6,7 @@
 11. Planning Storage in the Cloud
 12. Deploying Storage in Google Cloud Platform
 13. Loading Data into Storage
+14. Networking in the Cloud: VPC and VPN
 
 ## 10. Computing with Cloud Functions
 
@@ -33,7 +34,7 @@ Events are a particular action that happens in Google Cloud, such as a file is u
 - Firebase – actions executed in Firebase database
 - Stackdriver Logging – set up a function to respond to change in Stackdriver Logging
 
-For each of the events that can occur you define a trigger – which a way of responding to an event.
+For each of the events that can occur you define a trigger – which is a way of responding to an event.
 
 Triggers have an associated function. The function is passed arguments with data about the event. The functions execute in response to the event.
 
@@ -334,7 +335,103 @@ gcloud dataproc clusters export [CLUSTER_NAME] --destination=[PATH_TO_FILE]
 gcloud dataproc clusters import [PATH_TO_FILE]
 ```
 
-### Pub/Sub
+### 13.8. Pub/Sub
 
 `gcloud pubsub topics publish [TOPICS_NAME] --message [MESSAGE]`
 `gcloud pubsub subscription pull  [SUBSCRIPTION_NAME] --auto-ack`
+
+## 14. Networking in the Cloud: VPC and VPN
+
+### 14.1. Into to VPC
+
+VPCs are software versions of physical networks that link resources in a project. GCP automatically creates VPC when you create a project. You can create additional VPCs and modify the VPC created by GCP.
+
+VPCs are global resources, so they are not tied to a specific region or zone. VPC contains subnets which are regional resources. Subnets have a range of IP addresses associated with them. Subnets provide private internal addresses. Resources use IP addresses to communicate with each other and with Google APIs.
+
+In addition, you can create **shared VPC** within an organization. The shared VPC is hosted in a common project.  Users can create resources in the shared VPC.
+
+You can also use **VPC peering** for interproject connectivity, even if an organization is not defined.
+
+### 14.2. Creating a VPC from Console
+
+- VPC Network -> [NAME]+[DESCRIPTION]
+- Subnets -> Automatic / Custom -> Private Google access & Flow logs
+- Firewall rules -> Dynamic Routing mode -> DNS server policy
+  - Regional routing will have Google Cloud Routers learn routes within a region.
+  - Global routing will enable Google Cloud Routers to learn routes on all subnetworks in the VPC.
+
+### 14.3. Creating VPC with gcloud
+
+`gcloud compute networks create [NETWORK_NAME] --subnet-mode=auto`
+
+`gcloud compute networks create [NETWORK_NAME] --subnet-mode=custom`
+`gcloud compute networks subnets create [SUBNET_NAME] --network=[NETWORK_NAME] --region=[REGION] --range=[CIDR_RANGE]`
+
+Classless interdomain routing (CIDR) allows network admins to define networks with the number of addresses that they need.
+
+CIDR address consists of 2 sets of numbers a network address for identifying a subnet and a host identifier.
+
+Network addresses:
+
+- 10.0.0.0
+- 172.16.0.0
+- 192.168.0.0
+
+Host identifier (/29, /28, etc.) indicates how many bits of an IP address (32 bits) to allocate to the network mask, which determines which addresses are within the block of the addresses and which are not. /29 identifies that 29 bits are used for specifying a network and 3 bits are used to specify the host address. With 3 bits you can create up to 8 addresses.
+
+### 14.4. Creating a shared VPC using gcloud
+
+Assign Shared VPC Admin role to org or folder level:
+
+`gcloud organization add-iam-policy binding [ORG_ID] --member=’user:[EMAIL_ADDRESS]’ --role=’roles/compute.xpnAdmin’`
+
+Enable shared VPC:
+
+`gcloud compute shared-vpc enable [HOST_PROJECT_ID]`
+
+Add projects to shared VPC:
+
+`gcloud compute shared-vpc associate project add [SERVICE_PROJECT_ID] --host-project=[HOST_PROJECT_ID]`
+
+### 14.5. VPC Peering
+
+Alternatively, VPC peering can be used for interproject traffic, when an organization does not exist. VPC peering implemented using the gcloud compute networks peering create command.
+
+`gcloud compute networks peering create [NAME] --network=[NETWORK] --peer-network=[PEER_NETWORK] --auto-create-routes`
+
+### 14.6. Deploy VM with a Custom Network
+
+`gcloud compute instances create[INSTANCE_NAME] --subnet=[SUBNET] --zone=[ZONE]`
+
+### 14.7. Firewalls
+
+Rules with the highest priority are applied first. Any rule with lower priority that matches is not applied. Priority is specified by an integer from 0 (highest) to 65535 (lowest).
+
+A VPC starts with 2 implied rules:
+
+- Allows egress to all destinations with priority 65535
+- Denies ingress from any source with priority 65535
+
+When VPC is automatically created, it is created with 4 default rules:
+
+- Allow SSH 22 with priority 65534
+- Allow RDP 3389 with priority 65534
+- Allow ICMP with priority 65534
+- Allow ingress from the same network with priority 65534
+
+### 14.8. Firewall in gcloud
+
+`gcloud compute firewall-rules create [NAME] --network=[NETWORK_NAME] --allow tcp:20000-25000`
+
+### 14.9. VPN
+
+1. Hybrid Connectivity -> VPN -> Create VPN Connection
+2. Reserve a static IP address
+3. Add Tunnel – to configure another network endpoint in the VPN. 3 routing options:
+    a. Dynamic (BGP) + Add Cloud Router + ASN number
+    b. Route-based
+    c. Policy-based
+
+`gcloud compute target-vpn-gateways`
+`gcloud compute forwarding-rule`
+`gcloud compute vpn-tunnels`
