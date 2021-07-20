@@ -7,7 +7,7 @@
 12. Deploying Storage in Google Cloud Platform
 13. Loading Data into Storage
 14. Networking in the Cloud: VPC and VPN
-15. Networking in the Cloud: DNS, Load Balancing and IP addressing
+15. Networking in the Cloud: DNS, Load Balancing, and IP addresses
 
 ## 10. Computing with Cloud Functions
 
@@ -437,7 +437,7 @@ When VPC is automatically created, it is created with 4 default rules:
 `gcloud compute forwarding-rule`
 `gcloud compute vpn-tunnels`
 
-## 15. Networking in the Cloud: DNS, Load Balancing and IP addressing
+## 15. Networking in the Cloud: DNS, Load Balancing, and IP addresses
 
 ### 15.1. Configuring Cloud DNS
 
