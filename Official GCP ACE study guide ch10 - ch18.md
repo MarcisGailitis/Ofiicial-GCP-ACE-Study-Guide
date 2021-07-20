@@ -4,6 +4,7 @@
 
 10. Computing with Cloud Functions
 11. Planning Storage in the Cloud
+12. Deploying Storage in Google Cloud Platform
 
 ## 10. Computing with Cloud Functions
 
@@ -126,3 +127,152 @@ NoSQL databases do not use the relational model and do not require a fixed struc
 
 - Cloud Firestore –uses a document data model. Cloud Firestore is designed for storing, sync, and querying data across distributed applications. Cloud Firestore supports transactions and provides multiregional replication.
 - Cloud Bigtable – uses a wide-column data model. Wide-column databases store tables that can have a wide number of columns. Not all rows need to use all the columns. Consistent low-millisecond latency. Designed for petabyte-scale databases, IoT data, analytics processing, data science applications. Designed for applications with high data volumes, and high-velocity ingest of data. Time-series, IoT, Financial, etc.
+
+## 12. Deploying Storage in Google Cloud Platform
+
+### 12.1. MySQL
+
+Connect to instance:
+
+`gcloud sql connect [INSTANCE_NAME] –user=[USERNAME]`
+
+it is a good practice not to specify passwords in the command line.
+
+In the MySQL command-line environment, you use MySQL commands not gcloud commands:
+
+```sql
+CREATE DATABASE database_name;
+USE database_name;
+CREATE TABLE books …;
+INSERT INTO books …;
+SELECT * FROM books;
+```
+
+### 12.2. MySQL backup
+
+Cloud SQL enables both on-demand and automatic backups.
+
+- Cloud SQL -> click in instance -> backups -> create backup
+
+Create on-demand backup:
+
+`gcloud sql backups create –instance [INSTANCE_NAME] – async`
+
+create scheduled backup:
+
+`gcloud sql instances patch [INSTANCE_NAME] -backup-start-time [HH:MM]`
+
+### 12.3. Datastore
+
+You add data to the Datastore database using the Entities option in the Datastore section of the console. The entity data structure is analogous to the schema in relational databases. You create an entity by clicking Create Entity and filling the form that appears. After creating entities you can query the document database using GQL (Graph Query Language), a query language similar to SQL.
+
+### 12.4. Datastore backup
+
+1. Create a storage bucket to keep the backup
+2. `gcloud datastore export –namespaces=’(default)’  gs://[BUCKET_NAME]`
+3. `gcloud datastore import gs://exampleBucket/exampleExport/exampleFileName.overall_export_metadata`
+
+### 12.5. BigQuery cost estimation
+
+BigQuery is a fully managed service, so Google takes care of backups and other basic administrative tasks.
+
+1. BigQuery provides an estimate in Query Editor lower right corner of how much data will be scanned.
+2. `bq query --location=[LOCATION] --use_legacy_sql=false –dry_run [SQL_QUERY]`
+3. You can use this number with the Pricing Calculator to estimate the costs.
+
+### 12.6. BigQuery Jobs
+
+Jobs in BigQuery are processes used to load, export, copy, or query data. Jobs are automatically created when you start any of these operations.
+
+- BigQuery -> Job History
+- Issue the bq show command with the -j flag and a job ID.
+- `bq show -j my-project-1234:US.bquijob_123x456_123y123z123c`
+
+### 12.7. Cloud Spanner
+
+Create Instance & Database:
+
+- Cloud Spanner -> Create Instance -> Create Database (using SQL data definition language)
+
+Add data:
+
+- Table Details -> Data -> Insert
+
+### 12.8. Cloud Pub/Sub
+
+There are 2 tasks required to deploy Pub/sub message queues:
+
+- creating a topic – a structure where apps can send messages. Pub/Sub receives the message and keeps it then until they are read by an application.
+- creating a subscription – apps read messages using subscription.
+
+Create a topic:
+
+- Pub/Sub -> Create a Topic -> [TOPIC_NAME] -> create
+- `gcloud pubsub topics create [TOPIC_NAME]`
+
+Create a subscription:
+
+- Topic name -> three dots -> New Subscription -> [SUBSCRIPTION NAME] +delivery type=(push, pull) -> create
+- `gcloud pubsub subscription create [SUBSCRIPTION_NAME] --topic [TOPIC_NAME]`
+
+### Bigtable
+
+Bigtable -> Create Instance
+
+To create a table you have to use the command line
+
+```shell
+- gcloud components update
+- gcloud components install cbt
+- echo instance = ace-exam-bigtable >> ~/.cbtrc
+- cbt createtable [TABLE_NAME]
+```
+
+list tables:
+
+cbt ls
+
+Add column family:
+
+`cbt createfamily [TABLE_NAME] [COLUMN_FAMILY_NAME]`
+
+Add value to the cell:
+
+`cbt set [TABLE_NAME] row1 [COLUMN_FAMILY_NAME]:col1=[CELL_VALUE]`
+
+Display contents of the table:
+
+`cbt read [TABLE_NAME]`
+
+### Dataproc
+
+Google Dataproc is Google’s managed Apache Spark and Apache Hadoop services.
+
+- Apache Spark = data analysis and machine learning
+- Apache Hadoop = well suited to batch big data applications
+
+Dataproc -> Create Cluster -> Specify:
+
+- Name
+- Region, zone
+- Cluster mode
+- Master node
+- Worker nodes (including local SSDs)
+
+`gcloud dataproc clusters create [CLUSTER_NAME] --zone [ZONE]`
+
+Dataproc -> Jobs -> Specify:
+
+- Job Type = Spark, PySpark, SparkR, Hive, Spark SQL, Pig, Hadoop
+
+`gcloud dataproc jobs submit spark --cluster [CLUSTER_NAME] –jar [JAR_FILE]`
+
+### Cloud Storage
+
+Change object storage class:
+
+`gsutil rewrite -s [STORAGE_CLASS] gs://[PATH_TO_OBJECT]`
+
+Move or rename object b/w buckets:
+
+`gsutil mv gs://[BUCKET]/[OBJECT] gs://[BUCKET]/[OBJECT]`
