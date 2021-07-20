@@ -5,6 +5,7 @@
 10. Computing with Cloud Functions
 11. Planning Storage in the Cloud
 12. Deploying Storage in Google Cloud Platform
+13. Loading Data into Storage
 
 ## 10. Computing with Cloud Functions
 
@@ -215,7 +216,7 @@ Create a subscription:
 - Topic name -> three dots -> New Subscription -> [SUBSCRIPTION NAME] +delivery type=(push, pull) -> create
 - `gcloud pubsub subscription create [SUBSCRIPTION_NAME] --topic [TOPIC_NAME]`
 
-### Bigtable
+### 12.9. Bigtable
 
 Bigtable -> Create Instance
 
@@ -244,7 +245,7 @@ Display contents of the table:
 
 `cbt read [TABLE_NAME]`
 
-### Dataproc
+### 12.10. Dataproc
 
 Google Dataproc is Google’s managed Apache Spark and Apache Hadoop services.
 
@@ -267,7 +268,7 @@ Dataproc -> Jobs -> Specify:
 
 `gcloud dataproc jobs submit spark --cluster [CLUSTER_NAME] --jar [JAR_FILE]`
 
-### Cloud Storage
+### 12.11. Cloud Storage
 
 Change object storage class:
 
@@ -276,3 +277,64 @@ Change object storage class:
 Move or rename object b/w buckets:
 
 `gsutil mv gs://[BUCKET]/[OBJECT] gs://[BUCKET]/[OBJECT]`
+
+## 13. Loading Data into Storage
+
+### 13.1. Cloud Storage
+
+`gsutil cp [LOCAL_OBJECT_LOCATION] gs://[BUCKET_NAME]/`
+
+### 13.1. Cloud SQL
+
+Cloud SQL -> Instance Details -> Import/Export -> CSV or SQL
+
+### 13.2. Cloud SQL command line
+
+Find service account for Cloud SQL:
+
+`gcloud sql instances describe [INSTANCE_NAME]`
+
+Add Cloud SQL write permission to bucket:
+
+`gsutil acl ch -u [SERVICE_ACCOUNT_ADDRESS]:W gs://[BUCKET_NAME]`
+
+Export:
+
+`gcloud sql export sql [INSTANCE_NAME] gs:// [BUCKET_NAME]/[FILE_NAME –database=[DATABASE_NAME]`
+
+### 13.3. Cloud Datastore
+
+Only through the command line. The same process as creating backups in the previous chapter. The export process will create a folder and the folder will contain a metadata file and a folder containing the exported data.
+
+### 13.4. BigQuery
+
+Export formats: CSV, json, and AVRO
+
+`bq extract –destination_format=[FORMAT] [DATASET].[TABLE] gs://[BUCKET]/[FILENAME]`
+
+Import formats: CSV, JSON, Parquet, PRC, and Cloud Datastore Backup
+
+`bq load –source_format=[FORMAT] [DATASET].[TABLE] gs://[BUCKET]/[FILENAME]`
+
+### 13.5. Cloud Spanner
+
+Cloud Spanner -> Instance Details -> Import/Export using Dataflow solution-> CSV or Avro
+
+### 13.6. Cloud Bigtable
+
+Cloud Bigtable does not have an Export and Import option in the GCP Console or gcloud. You have  2 options – using a Java application or using the HBase interface to execute HBase commands.
+
+### 13.7. Dataproc
+
+Cloud Dataproc does have import/export commands to save/restore cluster configuration data.
+
+```shell
+gcloud components install beta
+gcloud dataproc clusters export [CLUSTER_NAME] --destination=[PATH_TO_FILE]
+gcloud dataproc clusters import [PATH_TO_FILE]
+```
+
+### Pub/Sub
+
+`gcloud pubsub topics publish [TOPICS_NAME] --message [MESSAGE]`
+`gcloud pubsub subscription pull  [SUBSCRIPTION_NAME] --auto-ack`
