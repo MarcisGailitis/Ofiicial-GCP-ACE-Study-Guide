@@ -134,7 +134,7 @@ NoSQL databases do not use the relational model and do not require a fixed struc
 
 Connect to instance:
 
-`gcloud sql connect [INSTANCE_NAME] –user=[USERNAME]`
+`gcloud sql connect [INSTANCE_NAME] --user=[USERNAME]`
 
 it is a good practice not to specify passwords in the command line.
 
@@ -156,11 +156,11 @@ Cloud SQL enables both on-demand and automatic backups.
 
 Create on-demand backup:
 
-`gcloud sql backups create –instance [INSTANCE_NAME] – async`
+`gcloud sql backups create --instance [INSTANCE_NAME] --async`
 
 create scheduled backup:
 
-`gcloud sql instances patch [INSTANCE_NAME] -backup-start-time [HH:MM]`
+`gcloud sql instances patch [INSTANCE_NAME] --backup-start-time [HH:MM]`
 
 ### 12.3. Datastore
 
@@ -169,7 +169,7 @@ You add data to the Datastore database using the Entities option in the Datastor
 ### 12.4. Datastore backup
 
 1. Create a storage bucket to keep the backup
-2. `gcloud datastore export –namespaces=’(default)’  gs://[BUCKET_NAME]`
+2. `gcloud datastore export --namespaces=’(default)’  gs://[BUCKET_NAME]`
 3. `gcloud datastore import gs://exampleBucket/exampleExport/exampleFileName.overall_export_metadata`
 
 ### 12.5. BigQuery cost estimation
@@ -177,7 +177,7 @@ You add data to the Datastore database using the Entities option in the Datastor
 BigQuery is a fully managed service, so Google takes care of backups and other basic administrative tasks.
 
 1. BigQuery provides an estimate in Query Editor lower right corner of how much data will be scanned.
-2. `bq query --location=[LOCATION] --use_legacy_sql=false –dry_run [SQL_QUERY]`
+2. `bq query [SQL_QUERY] --location=[LOCATION] --use_legacy_sql=false --dry_run`
 3. You can use this number with the Pricing Calculator to estimate the costs.
 
 ### 12.6. BigQuery Jobs
@@ -265,7 +265,7 @@ Dataproc -> Jobs -> Specify:
 
 - Job Type = Spark, PySpark, SparkR, Hive, Spark SQL, Pig, Hadoop
 
-`gcloud dataproc jobs submit spark --cluster [CLUSTER_NAME] –jar [JAR_FILE]`
+`gcloud dataproc jobs submit spark --cluster [CLUSTER_NAME] --jar [JAR_FILE]`
 
 ### Cloud Storage
 
