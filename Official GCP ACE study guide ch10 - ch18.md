@@ -7,6 +7,7 @@
 12. Deploying Storage in Google Cloud Platform
 13. Loading Data into Storage
 14. Networking in the Cloud: VPC and VPN
+15. Networking in the Cloud: DNS, Load Balancing and IP addressing
 
 ## 10. Computing with Cloud Functions
 
@@ -127,7 +128,7 @@ Cloud SQL is used for databases that do not need to scale horizontally – by ad
 
 NoSQL databases do not use the relational model and do not require a fixed structure or schema. When no fixed schema is required, developers have the option to store different attributes in different records.
 
-- Cloud Firestore –uses a document data model. Cloud Firestore is designed for storing, sync, and querying data across distributed applications. Cloud Firestore supports transactions and provides multiregional replication.
+- Cloud Firestore – uses a document data model. Cloud Firestore is designed for storing, sync, and querying data across distributed applications. Cloud Firestore supports transactions and provides multiregional replication.
 - Cloud Bigtable – uses a wide-column data model. Wide-column databases store tables that can have a wide number of columns. Not all rows need to use all the columns. Consistent low-millisecond latency. Designed for petabyte-scale databases, IoT data, analytics processing, data science applications. Designed for applications with high data volumes, and high-velocity ingest of data. Time-series, IoT, Financial, etc.
 
 ## 12. Deploying Storage in Google Cloud Platform
@@ -301,7 +302,7 @@ Add Cloud SQL write permission to bucket:
 
 Export:
 
-`gcloud sql export sql [INSTANCE_NAME] gs:// [BUCKET_NAME]/[FILE_NAME –database=[DATABASE_NAME]`
+`gcloud sql export sql [INSTANCE_NAME] gs:// [BUCKET_NAME]/[FILE_NAME --database=[DATABASE_NAME]`
 
 ### 13.3. Cloud Datastore
 
@@ -311,11 +312,11 @@ Only through the command line. The same process as creating backups in the previ
 
 Export formats: CSV, json, and AVRO
 
-`bq extract –destination_format=[FORMAT] [DATASET].[TABLE] gs://[BUCKET]/[FILENAME]`
+`bq extract --destination_format=[FORMAT] [DATASET].[TABLE] gs://[BUCKET]/[FILENAME]`
 
 Import formats: CSV, JSON, Parquet, PRC, and Cloud Datastore Backup
 
-`bq load –source_format=[FORMAT] [DATASET].[TABLE] gs://[BUCKET]/[FILENAME]`
+`bq load --source_format=[FORMAT] [DATASET].[TABLE] gs://[BUCKET]/[FILENAME]`
 
 ### 13.5. Cloud Spanner
 
@@ -435,3 +436,79 @@ When VPC is automatically created, it is created with 4 default rules:
 `gcloud compute target-vpn-gateways`
 `gcloud compute forwarding-rule`
 `gcloud compute vpn-tunnels`
+
+## 15. Networking in the Cloud: DNS, Load Balancing and IP addressing
+
+### 15.1. Configuring Cloud DNS
+
+Cloud DNS is a Google service that provides domain name resolution. At the most basic level, DNS services map domain names, such as example.com to IP addresses such as 35.20.24.107. A managed zone contains DNS records associated with a DNS name suffix, such as aceexamdns1.com. DNS records contain specific detail about the zone:
+
+- A record maps an IP address to an IPv4
+- AAAA record maps an IP address to anIPv6
+- CNAME record maps canonical name, which contains alias names of a domain.
+
+### 15.2. Creating DNS manages Zones
+
+Network -> Cloud DNS -> DNS zones -> Create Zone:
+
+- Select zone type
+- Zone name
+- DNS name
+- DNSSEC is a DNS Security, which provides strong authentication of clients communicating with DNS services to prevent spoofing and cache poisoning.
+
+When a zone is created NS (Name Server) and SOA (start of authority) records are added.
+
+To add a record click on Add Record Set.
+
+TTL = Time to Live parameter specifies how long the record can live in a cache. This is the period DNS resolvers should cache the data before querying for the value again.
+
+`gcloud dns managed-zones create [ZONE_NAME] --description=[DESCRIPTION] --dns-name=[DNS_NAME]`
+
+- `--visibility=private`, to make the DNS zone private
+
+To add a record, you start a transaction, add information and execute the transaction:
+
+`gcloud dns record-sets transaction start --zone=[ZONE_NAME]`
+`gcloud dns record-sets transaction add --name=aceexamzone.com --ttl=300 --type=A --zone=[ZONE_NAME]`
+`gcloud dns record-sets transaction execute --zone=[ZONE_NAME]`
+
+### 15.3. Types of Load Balancers
+
+LBs distribute workload to servers running an application.
+
+The load balancers offered by GCP are characterized by three features:
+
+- Internal vs external
+- Global vs regional
+- Traffic types like HTTPS and TCP
+
+Global:
+
+- HTTP, HTTPS
+- TCP proxy
+- SSL proxy
+
+Internal:
+
+- TCP LB
+- UDP internal
+- Network TCP/UDP
+
+### 15.4. Configuring Load Balancers
+
+Network Services -> Load Balancing -> Create Load Balancer -> select LB -> Configure Backend, Frontend
+
+`gcloud compute forwarding-rules create ace-exam-lb --port=80 --target-pool ace-exam-pool`
+`gcloud compute target-pools add-instances ace-exam-pool --instances ig1,ig2`
+
+### 15.5. Expanding CIDR block
+
+`gcloud compute networks subnets expand-ip-range [SUBNET_NAME] --prefix-length 16`
+
+You cannot decrease prefix length. You would have to recreate the subnet with a smaller number of addresses.
+
+### 15.6. Reserving IP address
+
+The Premium Network Service Tier routes all traffic over Google’s global network.
+
+`gcloud compute addresses crate [IP_ADDRESS_NAME] --region=[REGION] --network-tier=PREMIUM`
