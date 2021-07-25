@@ -9,6 +9,7 @@
 14. Networking in the Cloud: VPC and VPN
 15. Networking in the Cloud: DNS, Load Balancing, and IP addresses
 16. Deploying Applications with Cloud Launcher and Deployment Manager
+17. Configuring Access and Security
 
 ## 10. Computing with Cloud Functions
 
@@ -518,11 +519,11 @@ The Premium Network Service Tier routes all traffic over Google’s global netwo
 
 ### 16.1.Marketplace
 
-Three licence types:
+Three license types:
 
 - Free
 - Paid
-- BYOL - Bring your own license
+- BYOL - Bring Your Own license
 
 Filter by:
 
@@ -531,7 +532,7 @@ Filter by:
 
 ### 16.2. Deployment Manager
 
-Deployment Manager configuration files are written in YAML syntax. The configuration files starts with the word syntax, followed by resource entities, which are defined using 3 fields:
+Deployment Manager configuration files are written in YAML syntax. The configuration files start with the word syntax, followed by resource entities, which are defined using 3 fields:
 
 - name
 - type
@@ -557,8 +558,91 @@ resources:
 
 ### 16.3. Deployment Manager Templates
 
-If your deployment configurations are becoming complicate, you can use deployment templates. Templates are another text file, you use to define resources and import those into configuration files. This allows you to reuse resource definitions in multiple places. Google recommends using Python to create template files unless the templates are simple, then use Jinja2.
+If your deployment configurations are becoming complicated, you can use deployment templates. Templates are another text file, you use to define resources and import those into configuration files. This allows you to reuse resource definitions in multiple places. Google recommends using Python to create template files unless the templates are simple, then use Jinja2.
 
 `gcloud deployment-manager deployments create [DEPLOYMENT_NAME] --config`
 
 `gcloud deployment-manager deployments describe [DEPLOYMENT_NAME]`
+
+## 17. Configuring Access and Security
+
+### 17.1. Managing Identity and Access Management
+
+It is important to know that the preferred way of assigning permissions to users, groups, and service accounts is through the IAM system. However, Google Cloud Platform did not always have IAM. Before that, permissions were granted using what is now known as primitive roles, which are fairly coarse-grained.
+
+### 17.2. Viewing Account Identity and Access Management Assignments
+
+Cloud Console -> IAM & Admin -> IAM:
+
+- Shows a list of identities and assigned roles, which are a collection of permissions.
+
+`gcloud projects get-iam-policy [PROJECT_NAME]`
+
+### 17.3. Assigning IAM Roles to accounts and groups
+
+Cloud Console -> IAM & Admin -> IAM -> Add link:
+
+- To add IAM roles to accounts and groups
+- Specify the name of the user or group
+- Select a role
+
+`gcloud projects add-iam-policy-binding [RESOURCE_NAME] --member user:[USER_EMAIL] --role [ROLE_ID]`
+
+### 17.4. To see permissions applied to a role
+
+Cloud Console -> IAM & Admin -> Roles:
+
+- Click on a checkbox next to a role name to display a list of permissions to the right
+
+`gcloud iam roles describe [ROLE_NAME]`
+
+### 17.5. Lease Privilege & Separation of duties
+
+- Least privilege – grant only the smallest set of permissions that is required
+- Separation of Duties – a single user should not be able o perform multiple sensitive operations that together could present a risk
+
+### 17.6. Define Custom Role
+
+Cloud Console -> IAM & Admin -> Roles -> Create Role -> Specify:
+
+- name
+- description
+- identifier
+- launch stage (alpha, beta, general Availability, Disabled)
+- and set of permissions
+
+`gcloud iam roles create [ROLE_NAME] --project [PROJECT_ID] --permissions [PERMISSION_LIST] --stage [LAUNCH STAGE]`
+
+### 17.7. Managing Service Accounts
+
+Three things Cloud engineer are expected to know:
+
+- Working with Scopes
+- Assigning service account to a VM
+- Granting access to a service account to another project
+
+### 17.8. Managing service account with scopes
+
+Scopes authorize access to API methods. The service account assigned to a VM has roles associated with it. To configure access controls for a VM you need to configure both Service Account Roles and scopes.
+A Scope is specified using a URL that starts with <https://www.googleapis.com/auth/> followed by permission of a resource.
+An instance can only perform an operation allowed by both IAM Role assigned to the service account and scopes defined to a resource.
+
+You set scopes in Compute Engine for a specific VM.
+
+`gcloud compute instances set-service-account [INSTANCE_NAME] --service-account [SERVICE_ACCOUNT_EMAIL] --scopes [SCOPES, ]`
+
+### 17.9. Assigning service account to a VM
+
+- IAM & Admin -> Service Accounts -> Create a Service Account
+- Assign roles to a Service Account
+- Navigate to VM instances -> Select instance -> Edit -> Service Account -> Change Service Account from a drop down list
+
+`gcloud compute instances create [INSTANCE_NAME] --service-account [SERVICE_ACCOUNT_EMAIL] --scopes [SCOPES, ]`
+
+### 17.10. Granting access to a service account to another project
+
+To grant access to a project, navigate to the IAM page of the console and add member. Use the service accounts email as the entity to add.
+
+### 17.11. Viewing Audit logs
+
+To view audit logs, navigate to the Stackdriver Logging Page in Cloud Console. You can select the resource, types of the log, the log level, and the period from which to display.
