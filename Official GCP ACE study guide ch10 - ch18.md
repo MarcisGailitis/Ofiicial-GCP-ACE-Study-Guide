@@ -8,6 +8,7 @@
 13. Loading Data into Storage
 14. Networking in the Cloud: VPC and VPN
 15. Networking in the Cloud: DNS, Load Balancing, and IP addresses
+16. Deploying Applications with Cloud Launcher and Deployment Manager
 
 ## 10. Computing with Cloud Functions
 
@@ -286,11 +287,11 @@ Move or rename object b/w buckets:
 
 `gsutil cp [LOCAL_OBJECT_LOCATION] gs://[BUCKET_NAME]/`
 
-### 13.1. Cloud SQL
+### 13.2. Cloud SQL
 
 Cloud SQL -> Instance Details -> Import/Export -> CSV or SQL
 
-### 13.2. Cloud SQL command line
+### 13.3. Cloud SQL command line
 
 Find service account for Cloud SQL:
 
@@ -304,11 +305,11 @@ Export:
 
 `gcloud sql export sql [INSTANCE_NAME] gs:// [BUCKET_NAME]/[FILE_NAME --database=[DATABASE_NAME]`
 
-### 13.3. Cloud Datastore
+### 13.4. Cloud Datastore
 
 Only through the command line. The same process as creating backups in the previous chapter. The export process will create a folder and the folder will contain a metadata file and a folder containing the exported data.
 
-### 13.4. BigQuery
+### 13.5. BigQuery
 
 Export formats: CSV, json, and AVRO
 
@@ -318,15 +319,15 @@ Import formats: CSV, JSON, Parquet, PRC, and Cloud Datastore Backup
 
 `bq load --source_format=[FORMAT] [DATASET].[TABLE] gs://[BUCKET]/[FILENAME]`
 
-### 13.5. Cloud Spanner
+### 13.6. Cloud Spanner
 
 Cloud Spanner -> Instance Details -> Import/Export using Dataflow solution-> CSV or Avro
 
-### 13.6. Cloud Bigtable
+### 13.7. Cloud Bigtable
 
 Cloud Bigtable does not have an Export and Import option in the GCP Console or gcloud. You have  2 options – using a Java application or using the HBase interface to execute HBase commands.
 
-### 13.7. Dataproc
+### 13.8. Dataproc
 
 Cloud Dataproc does have import/export commands to save/restore cluster configuration data.
 
@@ -336,7 +337,7 @@ gcloud dataproc clusters export [CLUSTER_NAME] --destination=[PATH_TO_FILE]
 gcloud dataproc clusters import [PATH_TO_FILE]
 ```
 
-### 13.8. Pub/Sub
+### 13.9. Pub/Sub
 
 `gcloud pubsub topics publish [TOPICS_NAME] --message [MESSAGE]`
 `gcloud pubsub subscription pull  [SUBSCRIPTION_NAME] --auto-ack`
@@ -512,3 +513,52 @@ You cannot decrease prefix length. You would have to recreate the subnet with a 
 The Premium Network Service Tier routes all traffic over Google’s global network.
 
 `gcloud compute addresses crate [IP_ADDRESS_NAME] --region=[REGION] --network-tier=PREMIUM`
+
+## 16. Deploying Applications with Cloud Launcher and Deployment Manager
+
+### 16.1.Marketplace
+
+Three licence types:
+
+- Free
+- Paid
+- BYOL - Bring your own license
+
+Filter by:
+
+--Category
+--Type
+
+### 16.2. Deployment Manager
+
+Deployment Manager configuration files are written in YAML syntax. The configuration files starts with the word syntax, followed by resource entities, which are defined using 3 fields:
+
+- name
+- type
+- properties
+
+For each property there is a single key-value pair or a list of key-value pairs:
+
+- The Machine type has single key-value pair
+- Disks have multiple properties
+
+```YAML
+resources:
+- type: compute.v1.instance
+  name: quickstart-deployment-vm
+  properties:
+    machineType: https://www.googleapis.com/compute/v1/projects/[MY_PROJECT]/zones/us-central1-f/machineTypes/f1-micro
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+```
+
+### 16.3. Deployment Manager Templates
+
+If your deployment configurations are becoming complicate, you can use deployment templates. Templates are another text file, you use to define resources and import those into configuration files. This allows you to reuse resource definitions in multiple places. Google recommends using Python to create template files unless the templates are simple, then use Jinja2.
+
+`gcloud deployment-manager deployments create [DEPLOYMENT_NAME] --config`
+
+`gcloud deployment-manager deployments describe [DEPLOYMENT_NAME]`
