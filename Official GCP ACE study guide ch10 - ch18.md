@@ -10,6 +10,7 @@
 15. Networking in the Cloud: DNS, Load Balancing, and IP addresses
 16. Deploying Applications with Cloud Launcher and Deployment Manager
 17. Configuring Access and Security
+18. Monitoring, Logging, and Cost Estimation
 
 ## 10. Computing with Cloud Functions
 
@@ -646,3 +647,84 @@ To grant access to a project, navigate to the IAM page of the console and add me
 ### 17.11. Viewing Audit logs
 
 To view audit logs, navigate to the Stackdriver Logging Page in Cloud Console. You can select the resource, types of the log, the log level, and the period from which to display.
+
+## 18. Monitoring, Logging, and Cost Estimation
+
+### 18.1. Monitoring with Stackdriver
+
+Stackdriver is a service for collecting performance metrics, logs, and event data from our resources. Metrics include measurements such as the average percent CPU utilization over the past minute and the number of bytes written to a storage service in the last minute.
+
+Stackdriver works in hybrid environments with support for GCP, AWS, and on-prem resources.
+
+### 18.2. Creating Alerts Based on Resource Metrics
+
+Metrics are defined measurements on a resource collected at regular intervals. Metrics return aggregate values, such as the max, min, or average values of the item measured, which could be CPU utilization, amounts of memory used, or a number of bytes written.
+
+1. Install Stackdriver agents
+2. Create a Workspace in Stackdriver Monitoring
+3. Select a project to monitor
+4. Initialize the Workspace
+5. Navigate to Stackdriver Monitoring to display a Monitoring Overview page
+6. Create a new Alerting Policy Policy (Condition + Notification Channels)
+    a. Add Condition (filters + Group By + Aligner + Reducer + Trigger)
+    b. Notification channel
+    c. Documentation
+
+### 18.3. Creating Custom Metrics
+
+If there is an application-specific metric you would like to monitor, you can create custom metrics. Custom metrics are like predefined metrics, except you create them. The names of custom metrics start with custom.googleapis.com/ so that they are easy to recognize by name.
+
+### 18.4. Logging with Stackdriver Logging
+
+Stackdriver Logging is a service for collecting, storing, filtering, and viewing log and event data generated in GCP and AWS. Logging is a managed service, so you do not need to configure or deploy servers to use the service.
+
+Thee ACE tasks:
+
+- Configuring Log Sinks
+- Viewing and Filtering Logs
+- Viewing Message Details
+
+### 18.5. Configuring Log Sinks
+
+Stackdriver Logging retains log for 30 days. This is sufficient if you use logs to diagnose operational issues but rarely view the logs after a few days. This is often not enough. BUT your organization may need to keep logs longer to comply with government or industry regulations. You may also want to analyze logs to gain insight into applications performance. For these cases, it is best to export logging data to a long-term storage system like Cloud Storage or BigQuery.
+
+Stackdriver Logging  -> Exports:
+
+- Name
+- Sink Service:
+  - BigQuery - to export to existing or new data set
+  - Cloud Storage – to export to existing/new bucket
+  - Cloud Pub/Sub – Existing/new Topic. Data is encoded in base64 in an object structure known as a LogEntry.
+  - Custom Destination – to export to another project
+- Sink Destination
+
+### 18.6. Viewing and Filtering Logs
+
+Stackdriver Logging -> Logs -> Filter based on:
+
+- Label
+- Resource Type – VM instances, subnetworks, projects, databases, etc.
+- Log type
+- Log Level – Error, Info, Warning, Debug
+- Time Limit – Last Hour, Last week, etc.
+
+### 18.7. Viewing Message Details
+
+Each log entry is displayed as a single line when you view the contents of logs. Notice the triangle icon at the left end of the line. If you click that icon, the line will expand to show additional detail. You can continue to drill down individually into each structure if there is a triangle at the left.
+Alternatively, you could click the Expand All link in the upper-right corner of the log entry.
+
+### 18.8. Cloud Trace
+
+Cloud Trace is a distributed tracing system for collecting latency data from an application. This helps developers understand where applications are spending their time and to identify where performance is degrading.
+
+### 18.9. Cloud Debug
+
+Cloud Debug is an application debugger for inspecting the state of the running program. Cloud Debug allows developers to insert log statements or take snapshots of the state of an application. The service is enabled by default on App Engine and can be enabled for Compute Engine and K8s.
+
+### 18.10. GCP Status
+
+<https://status.cloud.google.com>. If green, then OK. Elif yellow, then disruption.
+
+### 18.11. Pricing Calculator
+
+Pricing Calculator helps GCP users understand the costs associated with services/configurations. You can specify the configuration of the resources, the time they will be used and the amount of data that will be stored.
