@@ -151,8 +151,8 @@ Stackdriver – logging, monitoring, error reporting, trace, debug, profile
 
 - Apigee
 - Data Prep – explore + prepare
-- Data flow – batch and stream processing
-- Data proc – managed Hadoop
+- Data Flow – batch and stream processing
+- Data Proc – managed Hadoop
 - Machine Learning
 
 ## 3. Projects, Service Accounts, and Billing
